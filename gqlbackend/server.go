@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/conormurraypuppet/gqlbackend/notifier"
+
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/conormurraypuppet/gqlbackend/graph"
 	"github.com/conormurraypuppet/gqlbackend/graph/generated"
@@ -33,8 +35,12 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+	done := make(chan bool)
+	defer close(done)
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	notifier := notifier.New(done)
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{Notifier: notifier}}))
 
 	http.Handle("/", CorsMiddleware(playground.Handler("GraphQL playground", "/query")))
 	http.Handle("/query", CorsMiddleware(srv))

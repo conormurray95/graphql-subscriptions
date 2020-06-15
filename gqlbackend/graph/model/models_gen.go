@@ -2,9 +2,18 @@
 
 package model
 
+import (
+	"time"
+)
+
 type NewTodo struct {
 	Text   string `json:"text"`
 	UserID string `json:"userId"`
+}
+
+type Notification struct {
+	EventCode string    `json:"eventCode"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type Todo struct {
