@@ -1,7 +1,10 @@
 import React from 'react';
 import { createApolloFetch } from 'apollo-fetch';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 
-const queryTodos = `query findTodos {
+
+const TODOS = gql`query findTodos {
   todos {
     text
     done
@@ -11,7 +14,7 @@ const queryTodos = `query findTodos {
   }
 }`;
 
-const addTodo = `mutation createTodo {
+const addTodo = gql`mutation createTodo {
   createTodo(input:{text:"todo", userId:"1"}) {
     user {
       id
@@ -21,18 +24,9 @@ const addTodo = `mutation createTodo {
   }
 }`
 
-const apolloFetch = createApolloFetch({
-  uri: 'http://localhost:8080/query',
-});
-
 function Dashboard(){
-  apolloFetch({
-    query: queryTodos,
-  }).then(res => {
-    console.log(res);
-  }).catch(err => {
-    console.log(err)
-  });
+  const { loading, error, data } = useQuery(TODOS);
+  console.log({data, loading, error});
 
   return (
     <div>

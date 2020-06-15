@@ -19,6 +19,7 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
 	}
 	r.todos = append(r.todos, todo)
+	r.Notifier.SendMessage("todo-added")
 	return todo, nil
 }
 
