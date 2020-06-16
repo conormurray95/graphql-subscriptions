@@ -1,36 +1,17 @@
 import React from 'react';
-import { createApolloFetch } from 'apollo-fetch';
-import { useQuery } from '@apollo/react-hooks';
-import { gql } from 'apollo-boost';
+import AddTodo from '../../components/AddTodo';
+import DisplayTodosInitialLoad from '../../components/DisplayTodosInitialLoad';
+import DisplayTodosPoll from '../../components/DisplayTodosPoll';
+import DisplayTodosNotification from '../../components/DisplayTodosNotification';
+import DisplayTodosSubscribe from '../../components/DisplayTodosSubscribe';
 
-
-const TODOS = gql`query findTodos {
-  todos {
-    text
-    done
-    user {
-      name
-    }
-  }
-}`;
-
-const addTodo = gql`mutation createTodo {
-  createTodo(input:{text:"todo", userId:"1"}) {
-    user {
-      id
-    }
-    text
-    done
-  }
-}`
 
 function Dashboard(){
-  const { loading, error, data } = useQuery(TODOS);
-  console.log({data, loading, error});
 
   return (
     <div>
-      Test data
+      <AddTodo/>
+      <DisplayTodosSubscribe/>
     </div>
   )
 }

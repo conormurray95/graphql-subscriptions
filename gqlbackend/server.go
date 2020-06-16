@@ -5,12 +5,15 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/conormurraypuppet/gqlbackend/notifier"
-
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/conormurraypuppet/gqlbackend/graph"
-	"github.com/conormurraypuppet/gqlbackend/graph/generated"
+	"github.com/99designs/gqlgen/handler"
+	gogql "github.com/99designs/gqlgen/handler"
+
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/graph"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/graph/generated"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/livenotifier"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/notifier"
+	"github.com/gorilla/websocket"
 )
 
 const defaultPort = "8080"
@@ -40,7 +43,16 @@ func main() {
 
 	notifier := notifier.New(done)
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{Notifier: notifier}}))
+	liveDone := make(chan bool)
+	defer close(liveDone)
+
+	liveNotifier := livenotifier.New(liveDone)
+
+	srv := gogql.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{Notifier: notifier, LiveNotifier: liveNotifier}}), handler.WebsocketUpgrader(websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}))
 
 	http.Handle("/", CorsMiddleware(playground.Handler("GraphQL playground", "/query")))
 	http.Handle("/query", CorsMiddleware(srv))

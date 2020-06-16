@@ -8,19 +8,31 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/conormurraypuppet/gqlbackend/graph/generated"
-	"github.com/conormurraypuppet/gqlbackend/graph/model"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/graph/generated"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/graph/model"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
 	todo := &model.Todo{
 		Text: input.Text,
 		ID:   fmt.Sprintf("T%d", rand.Int()),
-		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
 	}
 	r.todos = append(r.todos, todo)
 	r.Notifier.SendMessage("todo-added")
+	r.LiveNotifier.SendMessage(*todo)
 	return todo, nil
+}
+
+func (r *mutationResolver) UpdateTodo(ctx context.Context, input model.UpdateTodo) (*model.Todo, error) {
+	for index, todo := range r.todos {
+		if todo.ID == input.ID {
+			r.todos[index].Done = input.Done
+			r.todos[index].Text = input.Text
+			r.Notifier.SendMessage("todo-updated")
+			return r.todos[index], nil
+		}
+	}
+	return nil, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
@@ -29,6 +41,10 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 
 func (r *subscriptionResolver) Notifications(ctx context.Context) (<-chan *model.Notification, error) {
 	return r.Notifier.RegisterSubscription(ctx.Done())
+}
+
+func (r *subscriptionResolver) TodoAdded(ctx context.Context) (<-chan *model.Todo, error) {
+	return r.LiveNotifier.RegisterSubscription(ctx.Done())
 }
 
 // Mutation returns generated.MutationResolver implementation.

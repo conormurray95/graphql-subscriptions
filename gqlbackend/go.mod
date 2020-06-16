@@ -1,4 +1,4 @@
-module github.com/conormurraypuppet/gqlbackend
+module github.com/conormurraypuppet/graphql-subscriptions/gqlbackend
 
 go 1.14
 

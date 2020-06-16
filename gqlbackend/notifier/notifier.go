@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/conormurraypuppet/gqlbackend/graph/model"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/graph/model"
 )
 
 // Notifier gets messages and sends them to subscription observers

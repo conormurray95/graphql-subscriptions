@@ -6,12 +6,6 @@ type Todo {
   id: ID!
   text: String!
   done: Boolean!
-  user: User!
-}
-
-type User {
-  id: ID!
-  name: String!
 }
 
 type Query {
@@ -20,11 +14,17 @@ type Query {
 
 input NewTodo {
   text: String!
-  userId: String!
+}
+
+input UpdateTodo {
+  id: ID!
+  done: Boolean!
+  text: String!
 }
 
 type Mutation {
   createTodo(input: NewTodo!): Todo!
+  updateTodo(input: UpdateTodo!): Todo!
 }
 
 "Time is an RFC3339 timestamp."
@@ -33,6 +33,7 @@ scalar Time
 type Subscription {
   "Subscribe for notifications"
   notifications: Notification!
+  todoAdded: Todo!
 }
 
 type Notification {

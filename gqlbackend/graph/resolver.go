@@ -1,8 +1,9 @@
 package graph
 
 import (
-	"github.com/conormurraypuppet/gqlbackend/graph/model"
-	"github.com/conormurraypuppet/gqlbackend/notifier"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/graph/model"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/livenotifier"
+	"github.com/conormurraypuppet/graphql-subscriptions/gqlbackend/notifier"
 )
 
 // This file will not be regenerated automatically.
@@ -10,6 +11,7 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	todos    []*model.Todo
-	Notifier *notifier.Notifier
+	todos        []*model.Todo
+	Notifier     *notifier.Notifier
+	LiveNotifier *livenotifier.LiveNotifier
 }
